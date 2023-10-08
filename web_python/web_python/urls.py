@@ -1,5 +1,5 @@
 """
-URL configuration for proyecto_pythonweb project.
+URL configuration for app_python project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -16,10 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from proyecto_pythonweb.views import bienvenida
-from proyecto_pythonweb.views import signin
-from proyecto_pythonweb.views import signup
-from proyecto_pythonweb.views import filemanager
+from app_python.views import bienvenida
+from app_python.views import signin
+from app_python.views import signup
+from app_python.views import filemanager
 
 urlpatterns = [
     path('admin/', admin.site.urls),
