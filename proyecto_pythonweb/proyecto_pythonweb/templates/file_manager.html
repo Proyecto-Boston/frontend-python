@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Files</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link type= 'text/css' rel="stylesheet" href='{% static "css/file_manager.css" %}''>
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="/homepage/">Inicio</a>
+        <a class="active" href="#">Mis archivos</a>
+        <a href="#logout">Cerrar sesi&oacute;n</a>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-3 d-none d-md-block sidebar" style="height: 100vh; width: 30%;">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <h4 class="nav-link active filtros-section">Filtros</h4>
+                            <div><button class="btn btn-light btn-orange btn-wide">Alfab&eacute;ticamente A-Z</button></div>
+                            <div><button class="btn btn-light btn-orange btn-wide">Alfab&eacute;ticamente Z-A</button></div>
+                            <div><button class="btn btn-light btn-orange btn-wide">Peso &gt;</button></div>
+                            <div><button class="btn btn-light btn-orange btn-wide">Peso &lt;</button></div>
+                            <div><button class="btn btn-light btn-orange btn-wide">Fecha m&aacute;s reciente</button></div>
+                            <div><button class="btn btn-light btn-orange btn-wide">Fecha m&aacute;s antigua</button></div>
+                        </li>
+                        <li class="nav-item">
+                            <h4 class="nav-link active">Carpetas</h4>
+                            <div><button class="btn btn-light btn-orange btn-wide">Universidad</button></div>
+                            <div><button class="btn btn-light btn-orange btn-wide">Familia</button></div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="col-md-9 ms-sm-auto col-lg-9 px-md-4" style="width: 70%;">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Fecha de subida</th>
+                                <th>Tamaño</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Archivo_1.docx</td>
+                                <td>27/02/2023</td>
+                                <td>745.60kb</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary btn-orange dropdown-toggle" type="button"
+                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                            Opciones
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#">Descargar</a>
+                                            <a class="dropdown-item" href="#">Editar nombre</a>
+                                            <a class="dropdown-item" href="#">Eliminar</a>
+                                            <a class="dropdown-item" href="#">Mover</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Archivo_2.docx</td>
+                                <td>13/03/2023</td>
+                                <td>120.50mb</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary btn-orange dropdown-toggle" type="button"
+                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                            Opciones
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#">Descargar</a>
+                                            <a class="dropdown-item" href="#">Editar nombre</a>
+                                            <a class="dropdown-item" href="#">Eliminar</a>
+                                            <a class="dropdown-item" href="#">Mover</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Video.mp4</td>
+                                <td>05/04/2023</td>
+                                <td>5.40gb</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary btn-orange dropdown-toggle" type="button"
+                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                            Opciones
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#">Descargar</a>
+                                            <a class="dropdown-item" href="#">Editar nombre</a>
+                                            <a class="dropdown-item" href="#">Eliminar</a>
+                                            <a class="dropdown-item" href="#">Mover</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

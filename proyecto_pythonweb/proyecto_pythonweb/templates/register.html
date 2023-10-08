@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link type= 'text/css' rel="stylesheet" href='{% static "css/login.css" %}''>
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="/homepage/">Inicio</a>
+        <a href="/login/">Ingresar</a>
+        <a class="active" href="#">Registro</a>
+    </div>
+    <section class="h-100 gradient-form" style="background-color: #eee;">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-xl-10">
+                    <div class="card rounded-3 text-black">
+                        <div class="row g-0">
+                            <div class="col-lg-6">
+                                <div class="card-body p-md-5 mx-md-4">
+                                    <div class="text-center">
+                                        <img src='{% static "images/Logo-UPB-2022.svg" %}'
+                                            style="width: 185px; margin: 10px;" alt="logo">
+                                        <h4 class="mt-1 mb-5 pb-1" style="font-weight: bold;">Somos la Universidad
+                                            Pontificia Bolivariana</h4>
+                                    </div>
+                                    <form>
+                                        <p>Digite sus datos para registrarse</p>
+                                        <div class="form-outline mb-4">
+                                            <input type="text" id="formNombre" class="form-control"
+                                                placeholder="Nombre" />
+                                            <label class="form-label" for="formNombre">Nombre</label>
+                                        </div>
+                                        <div class="form-outline mb-4">
+                                            <input type="text" id="formApellido" class="form-control"
+                                                placeholder="Apellido" />
+                                            <label class="form-label" for="formApellido">Apellido</label>
+                                        </div>
+                                        <div class="form-outline mb-4">
+                                            <input type="email" id="form2Example11" class="form-control"
+                                                placeholder="Email" />
+                                            <label class="form-label" for="form2Example11">Usuario</label>
+                                        </div>
+                                        <div class="form-outline mb-4">
+                                            <input type="password" id="form2Example22" class="form-control"
+                                                placeholder="Contrase&ntilde;a" />
+                                            <label class="form-label" for="form2Example22">Contrase&ntilde;a</label>
+                                        </div>
+                                        <div class="text-center pt-1 mb-5 pb-1">
+                                            <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3"
+                                                type="button">Registro</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
+                                <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                                    <h4 class="mb-4">Protegemos tus archivos</h4>
+                                    <p class="small mb-0">La facultad de Ingenier&iacute;a Civil de la UPB ahora cuenta con un
+                                        sistema de almacenamiento de archivos seguro para
+                                        que puedas guardar tus archivos sin riesgo a perder acceso o que sean vistos por
+                                        personas no autorizadas.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

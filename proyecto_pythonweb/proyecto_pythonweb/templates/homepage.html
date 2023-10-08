@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link type= 'text/css' rel="stylesheet" href='{% static "css/homepage.css" %}''>
+</head>
+
+<body>
+    <div class="topnav">
+        <a class="active" href="#">Inicio</a>
+        <a href="/login/">Ingresar</a>
+        <a href="/register/">Registro</a>
+    </div>
+    <img src='{% static "images/frontpage_cover.jpg" %}' alt="Full-width Image"
+        class="full-width-image">
+    <div class="content">
+        <h1>Bienvenido a nuestro portal de almacenamiento de datos UPB.</h1>
+    </div>
+</body>
+
+</html>
