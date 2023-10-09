@@ -55,7 +55,7 @@ ROOT_URLCONF = 'web_python.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['D:/Programacion/Sistemas Distribuidos/Proyecto_Boston/frontend-python/web_python/app_python/templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'app_python', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
