@@ -1,12 +1,14 @@
 document.getElementById("choose-file-button").addEventListener("click", function () {
     document.getElementById("file-input").click();
 });
+
 document.getElementById("upload-button").addEventListener("click", function (event) {
     const fileInput = document.getElementById("file-input");
     const errorMessage = document.getElementById("error-message");
 
     if (fileInput.files.length === 0) {
-        event.preventDefault(); // Prevent form submission
+        event.preventDefault(); // No dejar que se envie el input form
+        // Explicación de por qué el botón no funcionó
         alert("No ha seleccionado un archivo");
         errorMessage.style.display = "block";
     } else {

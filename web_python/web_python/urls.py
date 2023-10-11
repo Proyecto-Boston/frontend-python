@@ -24,7 +24,7 @@ from app_python.views import filemanager
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('homepage/', bienvenida),
-    path('login/', signin),
-    path('register/', signup),
+    path('login/', signin, name='login'),
+    path('register/', signup, name='register'),
     path('manage/', filemanager, name='manager')
 ]

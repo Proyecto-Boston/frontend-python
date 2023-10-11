@@ -5,9 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Registration Page</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link type= 'text/css' rel="stylesheet" href='{% static "css/login.css" %}''>
+    <link type='text/css' rel="stylesheet" href='{% static "css/login.css" %}'>
 </head>
 
 <body>
@@ -30,31 +30,32 @@
                                         <h4 class="mt-1 mb-5 pb-1" style="font-weight: bold;">Somos la Universidad
                                             Pontificia Bolivariana</h4>
                                     </div>
-                                    <form>
+                                    <form method="post" action="{% url 'register' %}">
+                                        {% csrf_token %}
                                         <p>Digite sus datos para registrarse</p>
                                         <div class="form-outline mb-4">
                                             <input type="text" id="formNombre" class="form-control"
-                                                placeholder="Nombre" />
+                                                placeholder="Nombre" name="first_name" required />
                                             <label class="form-label" for="formNombre">Nombre</label>
                                         </div>
                                         <div class="form-outline mb-4">
                                             <input type="text" id="formApellido" class="form-control"
-                                                placeholder="Apellido" />
+                                                placeholder="Apellido" name="last_name" required />
                                             <label class="form-label" for="formApellido">Apellido</label>
                                         </div>
                                         <div class="form-outline mb-4">
-                                            <input type="email" id="form2Example11" class="form-control"
-                                                placeholder="Email" />
-                                            <label class="form-label" for="form2Example11">Usuario</label>
+                                            <input type="email" id="formEmail" class="form-control"
+                                                placeholder="Email" name="email" required />
+                                            <label class="form-label" for="formEmail">Correo</label>
                                         </div>
                                         <div class="form-outline mb-4">
-                                            <input type="password" id="form2Example22" class="form-control"
-                                                placeholder="Contrase&ntilde;a" />
-                                            <label class="form-label" for="form2Example22">Contrase&ntilde;a</label>
+                                            <input type="password" id="formPassword" class="form-control"
+                                                placeholder="Contrase&ntilde;a" name="password" required />
+                                            <label class="form-label" for="formPassword">Contrase&ntilde;a</label>
                                         </div>
                                         <div class="text-center pt-1 mb-5 pb-1">
                                             <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3"
-                                                type="button">Registro</button>
+                                                type="submit">Registro</button>
                                         </div>
                                     </form>
                                 </div>
