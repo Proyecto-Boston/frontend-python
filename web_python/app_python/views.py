@@ -38,6 +38,13 @@ def signup(request):
 
 
 def filemanager(request):
+    # List de archivos (el arreglo contendrá la lista de archivos de la BD Scala)
+    files = [
+        {"name": "Archivo_1.docx", "date": "27/02/2023", "size": "745.60kb"},
+        {"name": "Archivo_2.docx", "date": "13/03/2023", "size": "120.50mb"},
+        {"name": "Video.mp4", "date": "05/04/2023", "size": "5.40gb"},
+    ]
+
     if request.method == 'POST':
         archivo_subido = request.FILES['file']
         print("Se eligió un archivo")
@@ -47,4 +54,4 @@ def filemanager(request):
     else:
         print("No hay archivo")
         pass
-    return render(request, 'file_manager.html')
+    return render(request, 'file_manager.html', {'files': files})

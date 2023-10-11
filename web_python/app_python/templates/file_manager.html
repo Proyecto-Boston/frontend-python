@@ -51,10 +51,11 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for file in files %}
                             <tr>
-                                <td>Archivo_1.docx</td>
-                                <td>27/02/2023</td>
-                                <td>745.60kb</td>
+                                <td>{{ file.name }}</td>
+                                <td>{{ file.date }}</td>
+                                <td>{{ file.size }}</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn btn-secondary btn-orange dropdown-toggle" type="button"
@@ -71,46 +72,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>Archivo_2.docx</td>
-                                <td>13/03/2023</td>
-                                <td>120.50mb</td>
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-secondary btn-orange dropdown-toggle" type="button"
-                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                            aria-expanded="false">
-                                            Opciones
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#">Descargar</a>
-                                            <a class="dropdown-item" href="#">Editar nombre</a>
-                                            <a class="dropdown-item" href="#">Eliminar</a>
-                                            <a class="dropdown-item" href="#">Mover</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Video.mp4</td>
-                                <td>05/04/2023</td>
-                                <td>5.40gb</td>
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-secondary btn-orange dropdown-toggle" type="button"
-                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                            aria-expanded="false">
-                                            Opciones
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#">Descargar</a>
-                                            <a class="dropdown-item" href="#">Editar nombre</a>
-                                            <a class="dropdown-item" href="#">Eliminar</a>
-                                            <a class="dropdown-item" href="#">Mover</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                     <div class="text-center">
