@@ -24,3 +24,27 @@ if (urlParams.has("upload_success")) {
     // Refrescar la página para quitar el parámetro y actualizar la lista de archivos
     window.location.href = window.location.pathname;
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    const deleteButtons = document.querySelectorAll(".delete-button");
+
+    deleteButtons.forEach(button => {
+        button.addEventListener("click", function() {
+            const directoryId = this.closest("li").querySelector(".btn-wide").getAttribute("data-directory-id");
+            // BORRAR DIRECTORIO DEL SERVIDOR AQUI
+            directories = directories.filter(directory => directory.directory_id !== parseInt(directoryId));
+            // Refresh the directory list (you can implement this)
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const deleteButtons = document.querySelectorAll(".delete-button");
+
+    deleteButtons.forEach(button => {
+        button.addEventListener("click", function() {
+            const listItem = this.closest("li"); // Get the parent <li> element
+            listItem.remove(); // Remove the <li> element from the DOM
+        });
+    });
+});

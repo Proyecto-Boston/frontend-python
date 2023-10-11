@@ -26,5 +26,5 @@ urlpatterns = [
     path('homepage/', bienvenida),
     path('login/', signin, name='login'),
     path('register/', signup, name='register'),
-    path('manage/', filemanager, name='manager')
+    path('manage/', filemanager, name='manager'),
 ]
