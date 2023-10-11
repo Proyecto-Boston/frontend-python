@@ -86,3 +86,15 @@ body {
 .sidebar {
     background-color: #b44593;
 }
+
+.btn-lighter {
+    background-color: #4d4d4d;
+    color:white;
+}
+
+.btn-lighter.dropdown-toggle:focus,
+.btn-lighter.dropdown-toggle:active {
+    background-color: #ff5733;
+    color: white;
+    border-color: #ff5733;
+}

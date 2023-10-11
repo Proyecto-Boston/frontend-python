@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import Context, Template
 from django.shortcuts import render
 
@@ -16,4 +16,13 @@ def signup(request):
     return render(request, 'register.html')
 
 def filemanager(request):
+    if request.method == 'POST':
+        archivo_subido = request.FILES['file']
+        print("Se eligió un archivo")
+        # AGREGAR LA INTERACCIÓN CON EL SERVIDOR JAVA PARA SUBIR EL ARCHIVO CUANDO LO AGREGUEN AL SERVIDOR
+        # ESTE RETURN AGREGA UN PARÁMETRO DE 'SUBIDA EXITOSA' A LA URL PARA QUE EL TEMPLATE SE REFRESQUE
+        return HttpResponseRedirect('/manage/?upload_success=1')
+    else:
+        print("No hay archivo")
+        pass
     return render(request, 'file_manager.html')
