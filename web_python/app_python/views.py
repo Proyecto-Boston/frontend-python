@@ -1,10 +1,16 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import Context, Template
 from django.shortcuts import render
+from zeep import Client
+from zeep.transports import Transport
 import requests
 
 # Request: Realizar peticiones al servidor
 # HttpResponse: Enviar la respuesta a las peticiones usando el protocolo Http
+
+# Inicialización de zeep, una libreria que permite interactuar con el WSDL usando Python
+transport = Transport(session=requests.Session())
+cliente = Client('http://localhost:1802/app?wsdl', transport=transport)
 
 
 def bienvenida(request):  # Pasamos un objeto de tipo request como primer argumento
@@ -13,13 +19,30 @@ def bienvenida(request):  # Pasamos un objeto de tipo request como primer argume
 
 def signin(request):
     if request.method == 'POST':
-        # Retornar los datos digitados en el form de login
+        # Retrieve the data entered in the login form
         email = request.POST['email']
         password = request.POST['password']
-        payload = {'email': email, 'password': password}
-        # AGREGAR LA INTERACCIÓN CON EL SERVIDOR JAVA PARA INICIAR SESIÓN
-        # SI ES EXITOSO EJECUTAR EL SIGUIENTE COMENTARIO
-        # return redirect('manager')
+
+        try:
+            # Enviar la solicitud SOAP al servidor
+            response = cliente.service.login(
+                email=email, password=password)
+
+            # Se pudo iniciar sesión?
+            if response == "Successful":
+                # Redireccionar al administrador de archivos
+                return HttpResponseRedirect('/manage/')
+            else:
+                # Si el login no pudo hacerse
+                error_message = "El inicio de sesión fallo. Por favor revise las credenciales"
+                print(error_message)
+                return render(request, 'login.html', {'error_message': error_message})
+        except Exception as e:
+            # Excepción
+            error_message = "Hubo un error al procesar la solicitud"
+            print(error_message)
+            return render(request, 'login.html', {'error_message': error_message})
+
     return render(request, 'login.html')
 
 
@@ -30,7 +53,8 @@ def signup(request):
         password = request.POST['password']
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
-        payload = {'email': email, 'password': password, 'primer nombre': first_name, 'apellido': last_name}
+        payload = {'email': email, 'password': password,
+                   'primer nombre': first_name, 'apellido': last_name}
         # Crear nuevo usuario
         # Iniciar sesión automáticamente tras el registro
         # return redirect('manager')
