@@ -28,7 +28,7 @@ def signin(request):
 
         try:
             # Crear un objeto Usuario
-            user_data = {"email": email, "password": password}
+            user_data = {"id": 1002, "email": email, "password": password}
 
             # Enviar la solicitud SOAP al servidor
             response = cliente.service.login(user_data)
@@ -36,6 +36,7 @@ def signin(request):
             # Se pudo iniciar sesión?
             if response.statusCode == 202:
                 # Redireccionar al administrador de archivos
+                print("Login exitoso")
                 return HttpResponseRedirect('/manage/')
             else:
                 # Si el login no pudo hacerse
@@ -73,7 +74,7 @@ def signup(request):
 
         try:
             # Crear un objeto Usuario
-            user_data = {"email": email, "password": password, "name": first_name, "surname": last_name}
+            user_data = {"id":1004, "email": email, "password": password, "name": first_name, "surname": last_name}
 
             # Enviar la solicitud SOAP al servidor
             response = cliente.service.register(user_data)

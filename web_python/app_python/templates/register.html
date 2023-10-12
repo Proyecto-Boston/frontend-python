@@ -34,8 +34,8 @@
                                         {% csrf_token %}
                                         <p>Digite sus datos para registrarse</p>
                                         <div class="form-outline mb-4">
-                                            <input type="text" id="formNombre" class="form-control"
-                                                placeholder="Nombre" name="first_name" required />
+                                            <input type="text" id="formNombre" class="form-control" placeholder="Nombre"
+                                                name="first_name" required />
                                             <label class="form-label" for="formNombre">Nombre</label>
                                         </div>
                                         <div class="form-outline mb-4">
@@ -44,8 +44,8 @@
                                             <label class="form-label" for="formApellido">Apellido</label>
                                         </div>
                                         <div class="form-outline mb-4">
-                                            <input type="email" id="formEmail" class="form-control"
-                                                placeholder="Email" name="email" required />
+                                            <input type="email" id="formEmail" class="form-control" placeholder="Email"
+                                                name="email" required />
                                             <label class="form-label" for="formEmail">Correo</label>
                                         </div>
                                         <div class="form-outline mb-4">
@@ -53,6 +53,9 @@
                                                 placeholder="Contrase&ntilde;a" name="password" required />
                                             <label class="form-label" for="formPassword">Contrase&ntilde;a</label>
                                         </div>
+                                        {% if success_message %}
+                                        <p style="color: green;">{{ success_message }}</p>
+                                        {% endif %}
                                         <div class="text-center pt-1 mb-5 pb-1">
                                             <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3"
                                                 type="submit">Registro</button>
@@ -63,7 +66,8 @@
                             <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
                                 <div class="text-white px-3 py-4 p-md-5 mx-md-4">
                                     <h4 class="mb-4">Protegemos tus archivos</h4>
-                                    <p class="small mb-0">La facultad de Ingenier&iacute;a Civil de la UPB ahora cuenta con un
+                                    <p class="small mb-0">La facultad de Ingenier&iacute;a Civil de la UPB ahora cuenta
+                                        con un
                                         sistema de almacenamiento de archivos seguro para
                                         que puedas guardar tus archivos sin riesgo a perder acceso o que sean vistos por
                                         personas no autorizadas.</p>
