@@ -15,8 +15,10 @@ transport = Transport(session=requests.Session())
 cliente = Client('http://localhost:1802/app?wsdl', transport=transport)
 print("Conectado a WSDL")
 
+
 def bienvenida(request):  # Pasamos un objeto de tipo request como primer argumento
     return render(request, 'homepage.html')
+
 
 def signin(request):
     if request.method == 'POST':
@@ -74,7 +76,8 @@ def signup(request):
 
         try:
             # Crear un objeto Usuario
-            user_data = {"id":1004, "email": email, "password": password, "name": first_name, "surname": last_name}
+            user_data = {"id": 1004, "email": email, "password": password,
+                         "name": first_name, "surname": last_name}
 
             # Enviar la solicitud SOAP al servidor
             response = cliente.service.register(user_data)
@@ -110,13 +113,9 @@ def signup(request):
 
 
 def filemanager(request):
-    # Lista de archivos (el arreglo contendrá la lista de archivos de la BD Scala)
-    files = [
-        {"name": "Archivo_1.docx", "date": "27/02/2023", "size": "745.60kb"},
-        {"name": "Archivo_2.docx", "date": "13/03/2023", "size": "120.50mb"},
-        {"name": "Video.mp4", "date": "05/04/2023", "size": "5.40gb"},
-    ]
-    # Lista de directorios (el arreglo contendrá la lista de directorios de la BD Scala)
+    # Lista de archivos (el arreglo contendrá la lista de archivos del usuario)
+    files = []
+    # Lista de directorios (el arreglo contendrá la lista de directorios del usuario)
     directories = [
         {"directory_id": 1, "name": "Universidad"},
         {"directory_id": 2, "name": "Familia"},
@@ -129,7 +128,35 @@ def filemanager(request):
         # AGREGAR LA INTERACCIÓN CON EL SERVIDOR JAVA PARA SUBIR EL ARCHIVO CUANDO LO AGREGUEN AL SERVIDOR
         # ESTE RETURN AGREGA UN PARÁMETRO DE 'SUBIDA EXITOSA' A LA URL PARA QUE EL TEMPLATE SE REFRESQUE
         return HttpResponseRedirect('/manage/?upload_success=1')
-    else:
-        print("No hay archivo")
-        pass
+
+    try:
+        # Aquí debería ir el método para obtener el ID del usuario actual cuando lo agreguen en el Gateway  
+        userId = 1
+        # Enviar la solicitud SOAP al servidor
+        response = cliente.service.getUserFiles(userId)
+
+        # Se pudieron cargar los archivos?
+        if response.statusCode == 200:
+            # Mostrar los archivos
+            success_message = "Archivos cargados"
+            files = [{"name": "Archivo_1.docx", "date": "27/02/2023", "size": "745.60kb"},
+                     {"name": "Archivo_2.docx",
+                         "date": "13/03/2023", "size": "120.50mb"},
+                     {"name": "Video.mp4", "date": "05/04/2023", "size": "5.40gb"}]
+        else:
+            # Si no se pudo importar archivos
+            error_message = "No pudieron importarse los archivos. Por favor vuelva a iniciar sesión"
+            print(error_message)
+            return render(request, 'file_manager.html', {'error_message': error_message, 'directories': directories})
+    except Fault as e:
+        # Errores SOAP (exceptions returned by the server)
+        error_message = f"SOAP Fault: {e.message}"
+        print(error_message)
+        return render(request, 'file_manager.html', {'error_message': error_message, 'directories': directories})
+    except Exception as e:
+        # Errores inesperados
+        error_message = f"Unexpected Error: {str(e)}"
+        print(error_message)
+        return render(request, 'file_manager.html', {'error_message': error_message, 'directories': directories})
+
     return render(request, 'file_manager.html', {'files': files, 'directories': directories})

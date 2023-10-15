@@ -86,8 +86,9 @@
                             {% csrf_token %}
                             <input type="file" name="file" id="file-input" style="display: none;">
                             <button class="btn btn-light btn-lighter" type="button" id="choose-file-button">Elegir archivo</button>
-                            <button class="btn btn-light btn-orange" type="submit" id="upload-button">Subir</button>
+                            <button class="btn btn-light btn-orange" type="submit" id="upload-button">Subir archivo</button>
                         </form>
+                        <div id="error-message" style="display: none; color: red;">Error subiendo archivo</div>
                     </div>
                 </div>
             </main>

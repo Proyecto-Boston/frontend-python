@@ -25,11 +25,11 @@ if (urlParams.has("upload_success")) {
     window.location.href = window.location.pathname;
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const deleteButtons = document.querySelectorAll(".delete-button");
 
     deleteButtons.forEach(button => {
-        button.addEventListener("click", function() {
+        button.addEventListener("click", function () {
             const directoryId = this.closest("li").querySelector(".btn-wide").getAttribute("data-directory-id");
             // BORRAR DIRECTORIO DEL SERVIDOR AQUI
             directories = directories.filter(directory => directory.directory_id !== parseInt(directoryId));
@@ -38,13 +38,14 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-document.addEventListener("DOMContentLoaded", function() {
+// Para cada carpeta renderizar un botón de 'borrar'
+document.addEventListener("DOMContentLoaded", function () {
     const deleteButtons = document.querySelectorAll(".delete-button");
 
     deleteButtons.forEach(button => {
-        button.addEventListener("click", function() {
-            const listItem = this.closest("li"); // Get the parent <li> element
-            listItem.remove(); // Remove the <li> element from the DOM
+        button.addEventListener("click", function () {
+            const listItem = this.closest("li");
+            listItem.remove();
         });
     });
 });
