@@ -149,8 +149,10 @@ def filemanager(request):
         return HttpResponseRedirect('/manage/?upload_success=1')
 
     try:
-        # Aquí debería ir el método para obtener el ID del usuario actual cuando lo agreguen en el Gateway
-        userId = 1
+        # ID del usuario que tiene la sesión abierta
+        userId = request.session.get('user_id', None)
+        print("Vista: ID del usuario iniciando sesión " + str(userId))
+
         # Enviar la solicitud SOAP al servidor
         response = cliente.service.getUserFiles(userId)
 

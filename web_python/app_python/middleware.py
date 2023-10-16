@@ -37,9 +37,12 @@ class JWTAuthenticationMiddleware:
                     user_data = json.loads(response.json)
                     request.session['user_id'] = user_data.get('user_id')
                     print("JWT validado correctamente")
+                    print("Middleware: ID del usuario iniciando sesión " + str(user_data.get('user_id')))
                 except Exception as e:
-                    print(f"Error verificando JWT: {str(e)}")
+                    print(f"Error verificando JWT")
+                    request.session.flush()
                     response = redirect('login')
+                    response.delete_cookie('jwt')
                     return response
             else:
                 # Si no hay JWT en las cookies
