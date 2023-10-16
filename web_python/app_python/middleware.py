@@ -1,9 +1,10 @@
-from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from zeep import Client
 from zeep.transports import Transport
 import json
 import requests
 
+# Middleware que autentica el JWT
 class JWTAuthenticationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -28,20 +29,45 @@ class JWTAuthenticationMiddleware:
                     response = self.cliente.service.verifySession(jwt_token)
                     if response.statusCode != 202:
                         print("JWT inválido o vencido. Por favor vuelva a iniciar sesión")
-                        return HttpResponseRedirect('/login/')
+                        request.session.flush()
+                        response = redirect('login')
+                        response.delete_cookie('jwt')
+                        return response
                     # Establecer el id del usuario que está en el sistema
                     user_data = json.loads(response.json)
                     request.session['user_id'] = user_data.get('user_id')
                     print("JWT validado correctamente")
                 except Exception as e:
                     print(f"Error verificando JWT: {str(e)}")
-                    return HttpResponseRedirect('/login/')
+                    response = redirect('login')
+                    return response
             else:
                 # Si no hay JWT en las cookies
                 print("No hay ningún JWT, debe iniciar sesión")
-                return HttpResponseRedirect('/login/')
+                response = redirect('login')
+                return response
 
         # Llamar a la siguiente vista
         response = self.get_response(request)
 
         return response
+
+# Middleware que verifica si el usuario ya inicio sesión (tiene un JWT) y redirecciona a /manage/ y al middleware de autenticación
+class LoggedInRedirect:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Vistas que no deben ejecutar el middleware
+        excluded_paths = ['/manage/', '/logout/']
+
+        # Si el usuario no está intentando cerrar sesión o acceder a administrador de archivos...
+        if request.path not in excluded_paths:
+            jwt_token = request.COOKIES.get('jwt')
+
+            if jwt_token:
+                print("El usuario ya inicio sesión, redireccionando a /manage/")
+                return redirect('/manage/')
+
+        # Llamar al siguiente middleware o vista
+        return self.get_response(request)

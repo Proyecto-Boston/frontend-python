@@ -79,6 +79,7 @@ def logout(request):
     response = redirect('homepage')
     response.delete_cookie('jwt')
     
+    print("La sesión se cerró exitosamente")
     return response
 
 
