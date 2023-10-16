@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import Context, Template
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from zeep import Client
 from zeep.transports import Transport
 from zeep.exceptions import Fault
@@ -39,7 +39,14 @@ def signin(request):
             if response.statusCode == 202:
                 # Redireccionar al administrador de archivos
                 print("Login exitoso")
-                return HttpResponseRedirect('/manage/')
+                # Almacenar el JWT que retorna el servidor en una HttpCookie
+                token_data = json.loads(response.json)
+                jwt_token = token_data.get('token')
+                print("Token "+jwt_token)
+                response = HttpResponseRedirect('/manage/')
+                response.set_cookie(
+                    'jwt', jwt_token, httponly=True, samesite='Strict')
+                return response
             else:
                 # Si el login no pudo hacerse
                 error_message = "El inicio de sesión falló. Por favor revise las credenciales"
@@ -62,6 +69,17 @@ def signin(request):
             return render(request, 'login.html', {'error_message': error_message})
 
     return render(request, 'login.html')
+
+
+def logout(request):
+    # Cerrar la sesión
+    request.session.flush()
+    
+    # Borrar el cookie JWT de la sesión
+    response = redirect('homepage')
+    response.delete_cookie('jwt')
+    
+    return response
 
 
 def signup(request):
@@ -130,7 +148,7 @@ def filemanager(request):
         return HttpResponseRedirect('/manage/?upload_success=1')
 
     try:
-        # Aquí debería ir el método para obtener el ID del usuario actual cuando lo agreguen en el Gateway  
+        # Aquí debería ir el método para obtener el ID del usuario actual cuando lo agreguen en el Gateway
         userId = 1
         # Enviar la solicitud SOAP al servidor
         response = cliente.service.getUserFiles(userId)

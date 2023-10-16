@@ -12,9 +12,11 @@
 
 <body>
     <div class="topnav">
-        <a href="/homepage/">Inicio</a>
         <a class="active" href="#">Mis archivos</a>
-        <a href="#logout">Cerrar sesi&oacute;n</a>
+        <form method="POST" action="{% url 'logout' %}" id="logoutForm">
+            {% csrf_token %}
+            <a href="#" onclick="document.getElementById('logoutForm').submit();">Cerrar sesi&oacute;n</a>
+        </form>
     </div>
     <div class="container-fluid">
         <div class="row">

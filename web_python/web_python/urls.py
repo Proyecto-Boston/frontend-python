@@ -20,11 +20,13 @@ from app_python.views import bienvenida
 from app_python.views import signin
 from app_python.views import signup
 from app_python.views import filemanager
+from app_python.views import logout
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('homepage/', bienvenida),
+    path('homepage/', bienvenida, name='homepage'),
     path('login/', signin, name='login'),
     path('register/', signup, name='register'),
     path('manage/', filemanager, name='manager'),
+    path('logout/', logout, name='logout'),
 ]
