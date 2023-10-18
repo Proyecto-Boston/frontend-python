@@ -216,8 +216,15 @@ def filemanager(request):
                     break
             file_data = {"id":file_to_download, "name": file_name, "path": file_route, "size": file_size, "userId": userId, "folderId": file_directory_id, "nodeId": 1}
             response = cliente.service.downloadFile(file_data)
-            # Este método está vacío en la BD así que no hago nada
-            pass
+            if response.statusCode == 200:
+                # Descargado exitosamente
+                print("El archivo se descargo con exito")
+                file_response = HttpResponse(response.fileData, content_type='application/octet-stream')
+                file_response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                return file_response
+            else:
+                print("Error: no pudo descargarse el archivo")
+                return redirect('manager')
 
     try:
         # Enviar la solicitud SOAP al servidor
@@ -290,7 +297,9 @@ def crear_carpeta(nombreCarpeta, userId, directories):
                 # Si no se pudo crear la carpeta
                 error_message = "No pudo crearse la carpeta. Por favor verifique que el nombre sea válido"
                 print(error_message)
+                print("-----------------------------------")
                 print("Error:")
+                print(str(response.statusCode))
                 print(str(response.details))
                 return False
         except Fault as e:
