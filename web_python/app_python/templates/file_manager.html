@@ -29,8 +29,6 @@
                             <div><button class="btn btn-light btn-orange btn-wide">Alfab&eacute;ticamente Z-A</button></div>
                             <div><button class="btn btn-light btn-orange btn-wide">Peso &gt;</button></div>
                             <div><button class="btn btn-light btn-orange btn-wide">Peso &lt;</button></div>
-                            <div><button class="btn btn-light btn-orange btn-wide">Fecha m&aacute;s reciente</button></div>
-                            <div><button class="btn btn-light btn-orange btn-wide">Fecha m&aacute;s antigua</button></div>
                         </li>
                         <li class="nav-item">
                             <h4 class="nav-link active">Carpetas</h4>
@@ -38,10 +36,14 @@
                             <li>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <button class="btn btn-light btn-orange btn-wide" data-directory-id="{{ directory.directory_id }}">{{ directory.name }}</button>
-                                    <button class="btn btn-light btn-sm delete-button">Borrar</button>
                                 </div>
                             </li>
                             {% endfor %}
+                            <form method="post" action="{% url 'manager' %}">
+                                {% csrf_token %}
+                                <input type="text" name="folder_name" id="folder-name-input" placeholder="Digite un nombre">
+                                <button type="submit" name="create_folder" class="btn-lighter" id="create-folder-button">Crear carpeta</button>
+                            </form>                            
                         </li>                        
                     </ul>
                 </div>
@@ -52,19 +54,17 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>Fecha de subida</th>
-                                <th>Tamaño</th>
-                                <th>Acciones</th>
+                                <th style="text-align: center;">Nombre</th>
+                                <th style="text-align: center;">Tamaño</th>
+                                <th style="text-align: center;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for file in files %}
                             <tr>
-                                <td>{{ file.name }}</td>
-                                <td>{{ file.date }}</td>
-                                <td>{{ file.size }}</td>
-                                <td>
+                                <td style="text-align: center;">{{ file.name }}</td>
+                                <td style="text-align: center;">{{ file.size }}</td>
+                                <td style="text-align: center;">
                                     <div class="dropdown">
                                         <button class="btn btn-secondary btn-orange dropdown-toggle" type="button"
                                             id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
@@ -72,9 +72,31 @@
                                             Opciones
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#">Descargar</a>
-                                            <a class="dropdown-item" href="#">Eliminar</a>
-                                            <a class="dropdown-item" href="#">Mover</a>
+                                            <form method="post" action="{% url 'manager' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="download_file_name" value="{{ file.id }}">
+                                                <button type="submit" class="dropdown-item">Descargar</button>
+                                            </form>
+                                            <div class="dropdown-item">
+                                                <form method="post" action="{% url 'manager' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="move_file_name" value="{{ file.id }}">
+                                                    <input type="hidden" name="move_file_fullname" value="{{ file.name }}">
+                                                    <select name="target_directory" required onchange="setDirectoryName(this)">
+                                                        <option value="">Mover</option>
+                                                        {% for directory in directories %}
+                                                            <option value="{{ directory.directory_id }}" data-dir-name="{{ directory.name }}">{{ directory.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <input type="hidden" name="target_directory_name" id="target_directory_name_{{ file.id }}">
+                                                    <button type="submit">Mover</button>
+                                                </form>
+                                            </div>                                            
+                                            <form method="post" action="{% url 'manager' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="delete_file_name" value="{{ file.id }}">
+                                                <button type="submit" class="dropdown-item">Eliminar</button>
+                                            </form>
                                         </div>
                                     </div>
                                 </td>
@@ -83,15 +105,22 @@
                         </tbody>
                     </table>
                     <div class="text-center">
+                        <select name="directory" id="directory-dropdown" required style="margin-bottom: 10px;">
+                            <option value="">-- Seleccione una carpeta --</option>
+                            {% for directory in directories %}
+                                <option value="{{ directory.directory_id }}">{{ directory.name }}</option>
+                            {% endfor %}
+                        </select>
+                        
                         <form method="post" enctype="multipart/form-data" id="upload-form">
                             {% csrf_token %}
                             <input type="file" name="file" id="file-input" style="display: none;">
                             <button class="btn btn-light btn-lighter" type="button" id="choose-file-button">Elegir archivo</button>
-                            <button class="btn btn-light btn-orange" type="submit" id="upload-button">Subir archivo</button>
+                            <button class="btn btn-light btn-orange" type="submit" name="upload_file_button" id="upload-button">Subir archivo</button>
                         </form>
                         <div id="error-message" style="display: none; color: red;">Error subiendo archivo</div>
-                    </div>
-                </div>
+                    </div>                    
+                </div>                
             </main>
         </div>
     </div>
