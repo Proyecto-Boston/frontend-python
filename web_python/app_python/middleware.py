@@ -9,7 +9,7 @@ class JWTAuthenticationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         transport = Transport(session=requests.Session())
-        self.cliente = Client('http://localhost:1802/app?wsdl', transport=transport)
+        self.cliente = Client('http://java.bucaramanga.upb.edu.co/app?wsdl', transport=transport)
         print("Conectado a WSDL")
 
     def __call__(self, request):

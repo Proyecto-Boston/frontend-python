@@ -12,12 +12,12 @@ document.getElementById("upload-button").addEventListener("click", function (eve
         // Notify the user why the button didn't work
         alert("No ha seleccionado un archivo");
         errorMessage.style.display = "block";
-    } else if (directoryDropdown.value === "") {
+    } /*else if (directoryDropdown.value === "") {
         event.preventDefault(); // Prevent the form from submitting
         // Notify the user that they need to select a directory
         alert("Debe seleccionar una carpeta para subir el archivo");
         errorMessage.style.display = "block";
-    } else {
+    }*/ else {
         errorMessage.style.display = "none";
     }
 });

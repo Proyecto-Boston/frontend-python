@@ -12,7 +12,7 @@ import json
 
 # Inicialización de zeep, una libreria que permite interactuar con el WSDL usando Python
 transport = Transport(session=requests.Session())
-cliente = Client('http://localhost:1802/app?wsdl', transport=transport)
+cliente = Client('http://java.bucaramanga.upb.edu.co/app?wsdl', transport=transport)
 print("Conectado a WSDL")
 
 
@@ -156,10 +156,18 @@ def filemanager(request):
         # SI SE ESTÁ TRATANDO DE SUBIR UN ARCHIVO...
         if 'upload_file_button' in request.POST:
             archivo_subido = request.FILES['file']
-            directorio_destino = int(request.POST['directory'])
-            nombre_directorio_destino = get_directory_name_by_id(directorio_destino, directories)
-            archivo_data = {"name": archivo_subido.name, "path": (nombre_directorio_destino+"/"+archivo_subido.name), "size": archivo_subido.size, "userId": userId, "folderId": directorio_destino, "nodeId": 1}
-            print("Se eligió un archivo")
+            print("ARCHIVO SELECCIONADO")
+            directorio_destino = request.POST.get('directory', None)
+            print("DIRECTORIO DESTINO VALUE: " + str(directorio_destino))
+            if str(directorio_destino) != "None":
+                print("---------------EL ARCHIVO ESTÁ EN UN DIRECTORIO--------------")
+                nombre_directorio_destino = get_directory_name_by_id(directorio_destino, directories)
+                print("NOMBRE DEL DIRECTORIO DEL ARCHIVO: " + nombre_directorio_destino)
+                archivo_data = {"id":1, "name": archivo_subido.name, "path": (nombre_directorio_destino+"/"+archivo_subido.name), "size": archivo_subido.size, "userId": userId, "folderId": directorio_destino, "nodeId": 1}
+            else:
+                print("---------------EL ARCHIVO NO TIENE DIRECTORIO----------")
+                archivo_data = {"id":1, "name": archivo_subido.name, "path": archivo_subido.name, "size": archivo_subido.size, "userId": userId, "folderId": 0, "nodeId": 1}
+            print("--- Se eligió un archivo, intentando subirlo al servidor... ---")
             response = cliente.service.uploadFile(archivo_data)
             # Se pudo subir el archivo?
             if response.statusCode == 200:
@@ -233,7 +241,7 @@ def filemanager(request):
         # Se pudieron cargar los archivos?
         if response.statusCode == 200:
             # Mostrar los archivos
-            print("Hola")
+            print("--- INTENTANDO IMPORTAR LOS ARCHIVOS DEL  USUARIO ---")
             if (str(response.details)=="El usuario no tiene archivos"):
                 print("El usuario no tiene archivos")
                 files=[]
