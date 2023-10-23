@@ -102,7 +102,7 @@ def signup(request):
             response = cliente.service.register(user_data)
 
             # Se pudo registrar?
-            if response.statusCode == 503:
+            if response.statusCode == 201:
                 # Mostrar un mensaje de registro exitoso
                 success_message = "Registro exitoso"
                 print(success_message)
