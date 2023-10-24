@@ -22,7 +22,6 @@ document.getElementById("upload-button").addEventListener("click", function (eve
     }
 });
 
-
 document.getElementById("create-folder-button").addEventListener("click", function (event) {
     const folderNameInput = document.getElementById("folder-name-input");
     const folderNameValue = folderNameInput.value.trim();
