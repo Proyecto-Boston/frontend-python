@@ -146,8 +146,7 @@ def filemanager(request):
         # Se pudieron cargar los archivos?
         if response.statusCode == 200:
             # Mostrar los archivos
-            print("--- INTENTANDO IMPORTAR LOS ARCHIVOS DEL  USUARIO ---")
-            print(str(response.statusCode))
+            print("--- Importando... ---")
             print(str(response.details))
             if str(response.details)=="Operacion exitosa.":
                 print("Importados archivos y carpetas")
@@ -176,19 +175,22 @@ def filemanager(request):
                     }
                     directories.append(folder_entry)
             elif str(response.details)=="El usuario no tiene archivos":
-                print("Importadas carpetas, no hay archivos")
-                server_data = json.loads(response.json)
-                for folder_info in server_data['folders']:
-                    folder_entry = {
-                        "id": folder_info['id'],
-                        "name": folder_info['nombre'],
-                        "size": folder_info['tamano'],
-                        "path": folder_info['ruta'],
-                        "nodeId": folder_info['nodoId'],
-                        "fatherId": folder_info['padreId'],
-                        "backNodeId": folder_info['respaldo_id']
-                    }
-                    directories.append(folder_entry)
+                print("Se trata de importar carpetas, no hay archivos")
+                if (response.json!=None):
+                    server_data = json.loads(response.json)
+                    for folder_info in server_data['folders']:
+                        folder_entry = {
+                            "id": folder_info['id'],
+                            "name": folder_info['nombre'],
+                            "size": folder_info['tamano'],
+                            "path": folder_info['ruta'],
+                            "nodeId": folder_info['nodoId'],
+                            "fatherId": folder_info['padreId'],
+                            "backNodeId": folder_info['respaldo_id']
+                        }
+                        directories.append(folder_entry)
+                else:
+                    print("El usuario tampoco tiene carpetas")
             else:
                 print("El usuario no tiene archivos ni carpetas")
             success_message = "---Operación completada exitosamente---"
@@ -239,22 +241,30 @@ def filemanager(request):
                 print("Error procesando directorio a eliminar")
         # SI SE ESTÁ TRATANDO DE SUBIR UN ARCHIVO...
         if 'upload_file_button' in request.POST:
+            print("-----------SE PRESIONÓ EL BOTÓN DE SUBIR UN ARCHIVO-------------")
             archivo_subido = request.FILES['file']
             print("ARCHIVO SELECCIONADO")
+            # Leer el archivo y guardarlo en bytes
+            file_data = archivo_subido.read()
+            # ID del directorio donde se está guardando el archivo
             directorio_destino = request.POST.get('directory', None)
             print("DIRECTORIO DESTINO VALUE: " + str(directorio_destino))
             if str(directorio_destino) != "None":
                 print("---------------EL ARCHIVO ESTÁ EN UN DIRECTORIO--------------")
                 nombre_directorio_destino = get_directory_name_by_id(directorio_destino, directories)
                 print("NOMBRE DEL DIRECTORIO DEL ARCHIVO: " + nombre_directorio_destino)
-                archivo_data = {"id":1, "name": archivo_subido.name, "path": (nombre_directorio_destino+"/"+archivo_subido.name), "size": archivo_subido.size, "userId": userId, "folderId": directorio_destino, "nodeId": 1}
+                archivo_data = {"id":1, "name": archivo_subido.name, "path": (nombre_directorio_destino),
+                                "fileData": file_data, "size": archivo_subido.size, "userId": userId, 
+                                "folderId": directorio_destino, "nodeId": 1, "backNodeId": 2}
             else:
                 print("---------------EL ARCHIVO NO TIENE DIRECTORIO----------")
-                archivo_data = {"id":1, "name": archivo_subido.name, "path": archivo_subido.name, "size": archivo_subido.size, "userId": userId, "folderId": 0, "nodeId": 1}
+                archivo_data = {"id":1, "name": archivo_subido.name, "path": "", "fileData": file_data, 
+                                "size": archivo_subido.size, "userId": userId, "folderId": 0, "nodeId": 1,
+                                "backNodeId": 2}
             print("--- Se eligió un archivo, intentando subirlo al servidor... ---")
             response = cliente.service.uploadFile(archivo_data)
             # Se pudo subir el archivo?
-            if response.statusCode == 200:
+            if response.statusCode == 201:
                 # Se subio el archivo
                 success_message = "Subida exitosa"
                 print(success_message)
@@ -263,6 +273,8 @@ def filemanager(request):
                 # Si no se puede subir el archivo
                 error_message = "Fallo al subir el archivo. Intentelo nuevamente"
                 print(error_message)
+                print(response.statusCode)
+                print(response.details)
                 return redirect('manager')
         if 'delete_file_name' in request.POST:
             file_to_delete = request.POST['delete_file_name']
@@ -317,19 +329,17 @@ def filemanager(request):
                 print("Error: no pudo descargarse el archivo")
                 return redirect('manager')
 
-
     return render(request, 'file_manager.html', {'files': files, 'directories': directories})
 
 def crear_carpeta(nombreCarpeta, userId):
-    # Primero comprobar que no exista otra carpeta con el mismo nombre
     try:
         # DECLARAR CARPETA
-        folder_data = {"id": 1, "name": nombreCarpeta, "path": nombreCarpeta, "userId": userId, "nodeId": 1,
+        folder_data = {"id": 1, "name": nombreCarpeta, "path": "", "userId": userId, "nodeId": 1,
                        "backNodeId": 2, "fatherId": 0}
         # ENVIAR SOLICITUD SOAP AL SERVIDOR
         response = cliente.service.createFolder(folder_data)
         # Se pudo crear la carpeta?
-        if response.statusCode == 200:
+        if response.statusCode == 201:
             # Se creo exitosamente
             print("Carpeta creada exitosamente")
             return True
