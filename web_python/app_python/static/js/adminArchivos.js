@@ -12,16 +12,16 @@ document.getElementById("upload-button").addEventListener("click", function (eve
         // Notify the user why the button didn't work
         alert("No ha seleccionado un archivo");
         errorMessage.style.display = "block";
-    } /*else if (directoryDropdown.value === "") {
-        event.preventDefault(); // Prevent the form from submitting
-        // Notify the user that they need to select a directory
-        alert("Debe seleccionar una carpeta para subir el archivo");
-        errorMessage.style.display = "block";
-    }*/ else {
+    } else {
         errorMessage.style.display = "none";
     }
 });
 
+document.getElementById("directory-dropdown").addEventListener("change", function () {
+    const selectedDirectory = this.value;
+    console.log('Selected option:', selectedDirectory);
+    document.getElementById("selected-directory").value = selectedDirectory;
+});
 
 document.getElementById("create-folder-button").addEventListener("click", function (event) {
     const folderNameInput = document.getElementById("folder-name-input");
@@ -33,11 +33,40 @@ document.getElementById("create-folder-button").addEventListener("click", functi
     }
 });
 
-function setDirectoryName(selectElement) {
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
-    const hiddenInput = document.getElementById('target_directory_name_' + selectedOption.dataset.dirId);
-    hiddenInput.value = selectedOption.dataset.dirName;
-}
+document.getElementById("directory-dropdown").addEventListener("change", function () {
+    const selectedDirectory = this.value;
+    console.log('Selected option:', selectedDirectory);
+    document.getElementById("selected-directory").value = selectedDirectory;
+});
+
+document.addEventListener("change", function (event) {
+    if (event.target.classList.contains("target-directory")) {
+        const selectedMoveDirectory = event.target.value;
+        const targetId = event.target.id;
+        console.log('Selected ID:', selectedMoveDirectory);
+        const fileId = targetId.replace("target_directory_", "");
+        console.log('File ID ' + fileId);
+        document.getElementById("target_directory_move_"+fileId).value = selectedMoveDirectory;
+    }
+});
+
+document.addEventListener("submit", function (event) {
+    // Check if the form being submitted is for sharing a file
+    if (event.target.querySelector("[name=share_file_button]")) {
+        const fileForm = event.target;
+        const shareEmailInput = fileForm.querySelector("[name=share_email]").value;
+        console.log("Share Email:", shareEmailInput);
+
+        // Check if the email field is empty
+        if (shareEmailInput.trim() === "") {
+            event.preventDefault(); // Prevent the form from submitting normally
+            alert("Por favor, ingrese un correo electrónico.");
+        } else {
+            document.getElementById("share_user_id").value = shareEmailInput;
+        }
+    }
+});
+
 
 // Revisar si la URL tiene el parámetro 'upload success' para saber si el usuario ha subido un archivo
 const urlParams = new URLSearchParams(window.location.search);

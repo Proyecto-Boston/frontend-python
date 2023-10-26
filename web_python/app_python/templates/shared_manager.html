@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Files</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link type='text/css' rel="stylesheet" href='{% static "css/file_manager.css" %}''>
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="{% url 'manager' %}">Mis archivos</a>
+        <a class="active" href="#">Archivos compartidos</a>
+        <form method="POST" action="{% url 'logout' %}" id="logoutForm">
+            {% csrf_token %}
+            <a href="#" onclick="document.getElementById('logoutForm').submit();">Cerrar sesi&oacute;n</a>
+        </form>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <main class="col-md-9 ms-sm-auto col-lg-9 px-md-4 mx-auto" style="width: 80%;">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center;">Nombre</th>
+                                <th style="text-align: center;">Tamaño</th>
+                                <th style="text-align: center;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in files %}
+                            <tr>
+                                <td style="text-align: center;">{{ file.name }}</td>
+                                <td style="text-align: center;">{{ file.size }}</td>
+                                <td style="text-align: center;">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary btn-orange dropdown-toggle" type="button"
+                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                            Opciones
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <form method="post" action="{% url 'shared' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="download_file_name" value="{{ file.id }}">
+                                                <button type="submit" class="dropdown-item">Descargar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>            
+                </div>                
+            </main>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/adminArchivos.js' %}"></script>    
+</body>
+
+</html>

@@ -13,6 +13,7 @@
 <body>
     <div class="topnav">
         <a class="active" href="#">Mis archivos</a>
+        <a href="{% url 'shared' %}">Archivos compartidos</a>
         <form method="POST" action="{% url 'logout' %}" id="logoutForm">
             {% csrf_token %}
             <a href="#" onclick="document.getElementById('logoutForm').submit();">Cerrar sesi&oacute;n</a>
@@ -73,7 +74,7 @@
                                             <form method="post" action="{% url 'manager' %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="download_file_name" value="{{ file.id }}">
-                                                <button type="submit" class="dropdown-item">Descargar</button>
+                                                <button type="submit" class="dropdown-item" name="download_file_button">Descargar</button>
                                             </form>
                                             <form method="post" action="{% url 'manager' %}">
                                                 {% csrf_token %}
@@ -85,25 +86,27 @@
                                                     {% csrf_token %}
                                                     <input type="hidden" name="move_file_name" value="{{ file.id }}">
                                                     <input type="hidden" name="move_file_fullname" value="{{ file.name }}">
-                                                    <select name="target_directory" required onchange="setDirectoryName(this)">
+                                                    <select name="target_directory_{{ file.id }}" id="target_directory_{{ file.id }}" class="target-directory">
                                                         <option value="">Mover</option>
                                                         {% for directory in directories %}
                                                             <option value="{{ directory.id }}" data-dir-name="{{ directory.name }}">{{ directory.name }}</option>
                                                         {% endfor %}
                                                     </select>
-                                                    <input type="hidden" name="target_directory_name" id="target_directory_name_{{ file.id }}">
-                                                    <button type="submit">Mover</button>
+                                                    <input type="hidden" name="target_directory_move_{{ file.id }}" id="target_directory_move_{{ file.id }}">
+                                                    <button type="submit" name="move_file_button">Mover</button>                                                                                               
                                                 </form>
                                             </div>            
                                             <form method="post" action="{% url 'manager' %}">
                                                 {% csrf_token %}
-                                                <input type="hidden" name="share_file_name" value="{{ file.id }}">
-                                                <button type="submit" class="dropdown-item">Compartir</button>
-                                            </form>                                
+                                                <input type="hidden" name="share_file_id" value="{{ file.id }}">
+                                                <input type="hidden" name="share_user_id" id="share_user_id">
+                                                <input type="text" name="share_email" placeholder="Correo">
+                                                <button type="submit" class="dropdown-item" name="share_file_button">Compartir</button>
+                                            </form>                                                                           
                                             <form method="post" action="{% url 'manager' %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="delete_file_name" value="{{ file.id }}">
-                                                <button type="submit" class="dropdown-item">Eliminar</button>
+                                                <button type="submit" class="dropdown-item" name="delete_file_button">Eliminar</button>
                                             </form>
                                         </div>
                                     </div>
@@ -119,10 +122,10 @@
                                 <option value="{{ directory.id }}">{{ directory.name }}</option>
                             {% endfor %}
                         </select>
-                        
                         <form method="post" enctype="multipart/form-data" id="upload-form">
                             {% csrf_token %}
                             <input type="file" name="file" id="file-input" style="display: none;">
+                            <input type="hidden" name="selected_directory" id="selected-directory">
                             <button class="btn btn-light btn-lighter" type="button" id="choose-file-button">Elegir archivo</button>
                             <button class="btn btn-light btn-orange" type="submit" name="upload_file_button" id="upload-button">Subir archivo</button>
                         </form>

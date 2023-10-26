@@ -251,9 +251,9 @@ def filemanager(request):
             # Leer el archivo y guardarlo en bytes
             file_data = archivo_subido.read()
             # ID del directorio donde se está guardando el archivo
-            directorio_destino = request.POST.get('directory', None)
+            directorio_destino = request.POST.get('selected_directory', None)
             print("DIRECTORIO DESTINO VALUE: " + str(directorio_destino))
-            if str(directorio_destino) != "None":
+            if str(directorio_destino) != "None" and str(directorio_destino)!="":
                 print("---------------EL ARCHIVO ESTÁ EN UN DIRECTORIO--------------")
                 nombre_directorio_destino = get_directory_name_by_id(directorio_destino, directories)
                 print("NOMBRE DEL DIRECTORIO DEL ARCHIVO: " + nombre_directorio_destino)
@@ -280,7 +280,7 @@ def filemanager(request):
                 print(response.statusCode)
                 print(response.details)
                 return redirect('manager')
-        if 'delete_file_name' in request.POST:
+        if 'delete_file_button' in request.POST:
             file_to_delete = request.POST['delete_file_name']
             response = cliente.service.deleteFile(file_to_delete)
             if response.statusCode == 200:
@@ -296,30 +296,51 @@ def filemanager(request):
                 print(response.statusCode)
                 print(response.details)
                 return redirect('manager')
-        if 'move_file_name' in request.POST:
+        if 'move_file_button' in request.POST:
+            print("-------MOVIENDO ARCHIVO--------")
             file_to_move = request.POST['move_file_name']
-            file_moved_name = request.POST['move_file_fullname']
-            target_directory_name = request.POST['target_directory_name']
-            file_data = {"routeName": (target_directory_name+"/"+file_moved_name), "fileId": file_to_move}
-            response = cliente.service.changeFilePath(file_data)
-            if response.statusCode == 200:
-                # Se movió el archivo exitosamente
-                success_message = "Archivo movido exitosamente"
-                print(success_message)
-                return redirect('manager')
-            else:
-                # No se pudo mover el archivo
-                error_message = "Fallo al mover el archivo. Intentelo nuevamente"
-                print(error_message)
-                return redirect('manager')
-        if 'download_file_name' in request.POST:
+            print("ID del archivo a moverse: " + str(file_to_move))
+            moving_path = get_file_path_by_id(file_to_move, files)
+            print("Ruta actual del archivo que se va a mover: " + moving_path)
+            target_directory_id = request.POST.get('target_directory_move_'+str(file_to_move), None)
+            if (target_directory_id!=None and target_directory_id!=""):
+                print("ID de directorio al que se quiere mover el archivo: " + str(target_directory_id))
+                target_directory_path = get_directory_path_by_id(target_directory_id, directories)
+                print("Ruta completa de ese directorio: " + target_directory_path)
+                # Remove the first character from target_directory_path
+                if target_directory_path!="":
+                    target_directory_path = target_directory_path[1:]+"/"
+                print("Ruta completa a la que se moverá el archivo: " + target_directory_path)
+                # Solo intentar mover el archivo si se seleccionó un directorio
+                response = cliente.service.moveFile(file_to_move, target_directory_path)
+                if response.statusCode == 201:
+                    # Se movió el archivo exitosamente
+                    success_message = "Archivo movido exitosamente"
+                    print(success_message)
+                    print(response.statusCode)
+                    print(response.details)
+                    return redirect('manager')
+                else:
+                    # No se pudo mover el archivo
+                    print("Fallo al mover el archivo. Intentelo nuevamente")
+                    print(response.statusCode)
+                    print(response.details)
+                    return redirect('manager')
+        if 'share_file_button' in request.POST:
+            file_to_share = request.POST['share_file_id']
+            print("Archivo que se va a compartir: " + str(file_to_share))
+        if 'download_file_button' in request.POST:
             file_to_download = request.POST['download_file_name']
+            print("ID del archivo a descargar " + file_to_download)
             response = cliente.service.downloadFile(file_to_download)
             if response.statusCode == 200:
                 # Descargado exitosamente
-                print("Nombre del archivo a descargar: ")
+                print(response.statusCode)
+                print(response.details)
+                print(str(response.fileData))
                 file_name = get_file_name_by_id(file_to_download,files)
-                if (file_name!=None):
+                print("Nombre del archivo a descargar: " + str(file_name))
+                if (file_name!=None and file_name!=""):
                     file_response = HttpResponse(response.fileData, content_type='application/octet-stream')
                     file_response['Content-Disposition'] = f'attachment; filename="{file_name}"'
                     print("El archivo se descargo con exito")
@@ -329,6 +350,7 @@ def filemanager(request):
                 return redirect('manager')
 
     return render(request, 'file_manager.html', {'files': files, 'directories': directories})
+
 
 def crear_carpeta(nombreCarpeta, userId):
     try:
@@ -367,6 +389,10 @@ def crear_carpeta(nombreCarpeta, userId):
         print(error_message)
         return False
     
+
+def shared(request):
+    return render (request, 'shared_manager.html')
+
 def get_directory_name_by_id(directory_id, directories):
     for directory in directories:
         if str(directory["id"]) == str(directory_id):
@@ -379,4 +405,18 @@ def get_file_name_by_id(file_id, files):
         if str(file["id"]) == str(file_id):
             print("Match found")
             return file["name"]
+    return None
+
+def get_file_path_by_id(file_id, files):
+    for file in files:
+        if str(file["id"]) == str(file_id):
+            print("Match found")
+            return file["path"]
+    return None
+
+def get_directory_path_by_id(directory_id, directories):
+    for directory in directories:
+        if str(directory["id"]) == str(directory_id):
+            print("Match found")
+            return directory["path"]
     return None

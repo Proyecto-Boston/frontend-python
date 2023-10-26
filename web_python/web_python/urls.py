@@ -21,6 +21,7 @@ from app_python.views import signin
 from app_python.views import signup
 from app_python.views import filemanager
 from app_python.views import logout
+from app_python.views import shared
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +30,5 @@ urlpatterns = [
     path('register/', signup, name='register'),
     path('manage/', filemanager, name='manager'),
     path('logout/', logout, name='logout'),
+    path('shared/', shared, name='shared')
 ]
