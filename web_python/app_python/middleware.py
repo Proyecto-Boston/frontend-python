@@ -25,14 +25,14 @@ class JWTAuthenticationMiddleware:
                     response.delete_cookie('jwt')
                     return response
                 
-                user_data = json.loads(response.json)
-                request.session['user_id'] = user_data.get('user_id')
-                print("JWT validado correctamente")
-                
-                if request.path not in ['/manage/', '/logout/']:
+                if request.path != '/manage/' and request.path != '/logout/':
                     print("El usuario ya inicio sesión, redireccionando a /manage/")
                     response = redirect('manager')
                     return response
+
+                user_data = json.loads(response.json)
+                request.session['user_id'] = user_data.get('user_id')
+                print("JWT validado correctamente")
                 
             except Exception as e:
                 print(f"Error verificando JWT: {str(e)}")

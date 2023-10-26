@@ -225,19 +225,22 @@ def filemanager(request):
         # SI SE ESTÁ TRATANDO DE BORRAR UNA CARPETA...
         if 'delete_folder' in request.POST:
             print("------Tratando de borrar la carpeta:------")
-            delete_folder_id = request.POST['delete_folder_id']
-            print(str(delete_folder_id))
+            folder_to_delete = request.POST['delete_folder_id']
+            print("Intentando borrar carpeta ID " + str(folder_to_delete))
             print("directorios: " + str(directories))
-            folder_to_delete = get_directory_attributes(delete_folder_id, directories)
             if (folder_to_delete!=None):
                 print("Se borrará la carpeta: "+str(folder_to_delete))
                 response = cliente.service.deleteFolder(folder_to_delete)
-                if response.statusCode == 200:
+                if response.statusCode == 201:
                     #Se elimino exitosamente
                     print("Carpeta eliminada exitosamente")
+                    print(response.statusCode)
+                    print(response.details)
                     return redirect('manager')
                 else:
                     print("Error eliminando la carpeta")
+                    print(response.statusCode)
+                    print(response.details)
             else:
                 print("Error procesando directorio a eliminar")
         # SI SE ESTÁ TRATANDO DE SUBIR UN ARCHIVO...
@@ -337,7 +340,7 @@ def crear_carpeta(nombreCarpeta, userId):
         # ENVIAR SOLICITUD SOAP AL SERVIDOR
         response = cliente.service.createFolder(folder_data)
         # Se pudo crear la carpeta?
-        if response.statusCode == 200:
+        if response.statusCode == 201:
             # Se creo exitosamente
             print("Carpeta creada exitosamente")
             return True
@@ -376,14 +379,4 @@ def get_file_name_by_id(file_id, files):
         if str(file["id"]) == str(file_id):
             print("Match found")
             return file["name"]
-    return None
-
-def get_directory_attributes(directory_id, directories):
-    for directory in directories:
-        if str(directory["id"]) == str(directory_id):
-            print("Match found")
-            this_directory = {"id": directory["id"], "name": directory["name"], "size": directory["size"],
-                              "path": directory["path"], "nodeId": directory["nodeId"], "fatherId": directory["fatherId"],
-                              "backNodeId": directory["backNodeId"]}
-            return this_directory
     return None
