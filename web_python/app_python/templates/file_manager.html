@@ -12,7 +12,7 @@
 
 <body>
     <div class="topnav">
-        <a class="active" href="#">Mis archivos</a>
+        <a class="active" href="{% url 'manager' %}">Mis archivos</a>
         <a href="{% url 'shared' %}">Archivos compartidos</a>
         <form method="POST" action="{% url 'logout' %}" id="logoutForm">
             {% csrf_token %}
@@ -29,7 +29,11 @@
                             {% for directory in directories %}
                             <li>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <button class="btn btn-light btn-orange btn-wide" data-directory-id="{{ directory.id }}">{{ directory.name }}</button>
+                                    <form method="post" action="{% url 'manager' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="folder_id" value="{{ directory.id }}">
+                                        <button type="submit" name="browse_folder_button" id="browse_folder_button" class="btn btn-light btn-orange btn-wide">{{ directory.name }}</button>
+                                    </form>
                                     <form method="post" action="{% url 'manager' %}">
                                         {% csrf_token %}
                                         <input type="hidden" name="delete_folder_id" value="{{ directory.id }}">
@@ -124,7 +128,7 @@
                         </select>
                         <form method="post" enctype="multipart/form-data" id="upload-form">
                             {% csrf_token %}
-                            <input type="file" name="file" id="file-input" style="display: none;">
+                            <input type="file" name="file" id="file-input" style="display: none;" multiple>
                             <input type="hidden" name="selected_directory" id="selected-directory">
                             <button class="btn btn-light btn-lighter" type="button" id="choose-file-button">Elegir archivo</button>
                             <button class="btn btn-light btn-orange" type="submit" name="upload_file_button" id="upload-button">Subir archivo</button>

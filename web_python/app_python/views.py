@@ -12,7 +12,7 @@ import json
 
 # Inicialización de zeep, una libreria que permite interactuar con el WSDL usando Python
 transport = Transport(session=requests.Session())
-cliente = Client('http://localhost:2376/app?wsdl', transport=transport)
+cliente = Client('http://java.bucaramanga.upb.edu.co:2376/app?wsdl', transport=transport)
 print("Conectado a WSDL")
 
 
@@ -198,6 +198,8 @@ def filemanager(request):
             # Si no se pudo importar archivos
             error_message = "No pudieron importarse los archivos. Por favor vuelva a iniciar sesión"
             print(error_message)
+            print(response.statusCode)
+            print(response.details)
             return render(request, 'file_manager.html', {'error_message': error_message, 'directories': directories})
     except Fault as e:
         # Errores SOAP (exceptions returned by the server)
@@ -245,40 +247,51 @@ def filemanager(request):
         # SI SE ESTÁ TRATANDO DE SUBIR UN ARCHIVO...
         if 'upload_file_button' in request.POST:
             print("-----------SE PRESIONÓ EL BOTÓN DE SUBIR UN ARCHIVO-------------")
-            archivo_subido = request.FILES['file']
-            print("ARCHIVO SELECCIONADO")
-            # Leer el archivo y guardarlo en bytes
-            file_data = archivo_subido.read()
+            archivos_subidos = request.FILES.getlist('file')  # Get a list of uploaded files
+            num_files_uploaded = len(archivos_subidos)
+
             # ID del directorio donde se está guardando el archivo
             directorio_destino = request.POST.get('selected_directory', None)
             print("DIRECTORIO DESTINO VALUE: " + str(directorio_destino))
-            if str(directorio_destino) != "None" and str(directorio_destino)!="":
-                print("---------------EL ARCHIVO ESTÁ EN UN DIRECTORIO--------------")
-                nombre_directorio_destino = get_directory_name_by_id(directorio_destino, directories)
-                print("NOMBRE DEL DIRECTORIO DEL ARCHIVO: " + nombre_directorio_destino)
-                archivo_data = {"id":1, "name": archivo_subido.name, "path": (nombre_directorio_destino),
-                                "fileData": file_data, "size": archivo_subido.size, "userId": userId, 
-                                "folderId": directorio_destino, "nodeId": 1, "backNodeId": 2}
-            else:
-                print("---------------EL ARCHIVO NO TIENE DIRECTORIO----------")
-                archivo_data = {"id":1, "name": archivo_subido.name, "path": "", "fileData": file_data, 
-                                "size": archivo_subido.size, "userId": userId, "folderId": 0, "nodeId": 1,
-                                "backNodeId": 2}
-            print("--- Se eligió un archivo, intentando subirlo al servidor... ---")
-            response = cliente.service.uploadFile(archivo_data)
-            # Se pudo subir el archivo?
-            if response.statusCode == 201:
-                # Se subio el archivo
-                success_message = "Subida exitosa"
-                print(success_message)
-                return HttpResponseRedirect('/manage/?upload_success=1')
-            else:
-                # Si no se puede subir el archivo
-                error_message = "Fallo al subir el archivo. Intentelo nuevamente"
-                print(error_message)
-                print(response.statusCode)
-                print(response.details)
-                return redirect('manager')
+
+            for archivo_subido in archivos_subidos:
+                print("ARCHIVO SELECCIONADO:", archivo_subido.name)
+                # Leer el archivo y guardarlo in bytes
+                file_data = archivo_subido.read()
+                
+                if str(directorio_destino) != "None" and str(directorio_destino) != "":
+                    print("---------------EL ARCHIVO ESTÁ EN UN DIRECTORIO--------------")
+                    nombre_directorio_destino = get_directory_name_by_id(directorio_destino, directories)
+                    print("NOMBRE DEL DIRECTORIO DEL ARCHIVO:", nombre_directorio_destino)
+                    archivo_data = {"id": 1, "name": archivo_subido.name, "path": nombre_directorio_destino,
+                                    "fileData": file_data, "size": archivo_subido.size, "userId": userId,
+                                    "folderId": directorio_destino, "nodeId": 1, "backNodeId": 2}
+                else:
+                    print("---------------EL ARCHIVO NO TIENE DIRECTORIO----------")
+                    archivo_data = {"id": 1, "name": archivo_subido.name, "path": "", "fileData": file_data,
+                                    "size": archivo_subido.size, "userId": userId, "folderId": 0, "nodeId": 1,
+                                    "backNodeId": 2}
+
+                print("--- Se eligió un archivo, intentando subirlo al servidor... ---")
+                response = cliente.service.uploadFile(archivo_data)
+                
+                # Check the response for each file upload
+                if response.statusCode == 201:
+                    # Se subio el archivo exitosamente
+                    success_message = "Subida exitosa: " + archivo_subido.name
+                    print(success_message)
+                    num_files_uploaded-=1
+                    if num_files_uploaded==0:
+                        return HttpResponseRedirect('/manage/?upload_success=1')
+                else:
+                    # Si no se pudo subir el archivo
+                    error_message = "Fallo al subir el archivo: " + archivo_subido.name
+                    print(error_message)
+                    print(response.statusCode)
+                    print(response.details)
+                    num_files_uploaded-=1
+                    if num_files_uploaded==0:
+                        return redirect('manager')
         if 'delete_file_button' in request.POST:
             file_to_delete = request.POST['delete_file_name']
             response = cliente.service.deleteFile(file_to_delete)
@@ -311,7 +324,7 @@ def filemanager(request):
                     target_directory_path = target_directory_path[1:]+"/"
                 print("Ruta completa a la que se moverá el archivo: " + target_directory_path)
                 # Solo intentar mover el archivo si se seleccionó un directorio
-                response = cliente.service.moveFile(file_to_move, target_directory_path)
+                response = cliente.service.moveFile(file_to_move, target_directory_id, target_directory_path)
                 if response.statusCode == 201:
                     # Se movió el archivo exitosamente
                     success_message = "Archivo movido exitosamente"
@@ -332,8 +345,14 @@ def filemanager(request):
             user_to_share = request.POST['share_email']
             print("Usuario al que se le va a compartir el archivo: " + str(user_to_share))
             response = cliente.service.shareFile(str(user_to_share), file_to_share)
-            print(response.statusCode)
-            print(response.details)
+            if response.statusCode == 201:
+                print("Se compartió el archivo exitosamente")
+                print(response.statusCode)
+                print(response.details)
+            else:
+                print("Error compartiendo el archivo con el usuario")
+                print(response.statusCode)
+                print(response.details)
         if 'download_file_button' in request.POST:
             file_to_download = request.POST['download_file_name']
             print("ID del archivo a descargar " + file_to_download)
@@ -352,6 +371,50 @@ def filemanager(request):
             else:
                 print("Error: no pudo descargarse el archivo")
                 return redirect('manager')
+        if 'browse_folder_button' in request.POST:
+            folder_to_enter = request.POST['folder_id']
+            if (folder_to_enter!=None and str(folder_to_enter)!=""):
+                print("ID del directorio al que se quiere entrar: " + str(folder_to_enter))
+                response = cliente.service.getSubFolderFiles(folder_to_enter)
+                if (response.statusCode == 201):
+                    print("Se entró a la carpeta exitosamente")
+                    print(response.statusCode)
+                    print(response.details)
+                    subFiles = []
+                    subDirectories = []
+                    sv_data = response.json.replace(",null", "")
+                    server_subdata = json.loads(sv_data)
+                    print("server_subdata: " + str(server_subdata))
+                    for file_info in server_subdata['files']:
+                        file_entry = {
+                            "id": file_info['id'],
+                            "name": file_info['nombre'],
+                            "size": f"{file_info['tamano']/1000}kb",
+                            "path": file_info['ruta'],
+                            "userId": userId,
+                            "directory_id": file_info['directorio_id']
+                        }
+                        subFiles.append(file_entry)
+                    print("Arreglo de archivos: " + str(subFiles))
+                    if "folders" in server_subdata:
+                        for folder_info in server_subdata['folders']:
+                            folder_entry = {
+                                "id": folder_info['id'],
+                                "name": folder_info['nombre'],
+                                "size": folder_info['tamano'],
+                                "path": folder_info['ruta'],
+                                "nodeId": folder_info['nodoId'],
+                                "fatherId": folder_info['padreId'],
+                                "backNodeId": folder_info['respaldo_id']
+                            }
+                            subDirectories.append(folder_entry)
+                        print("Arreglo de subdirectorios: " + str(subDirectories))
+                    return render(request, 'file_manager.html', {'files': subFiles, 'directories': subDirectories})
+                else:
+                    print("Error comunicandose con la carpeta")
+                    print(response.statusCode)
+                    print(response.details)
+                    return redirect('manager')
 
     return render(request, 'file_manager.html', {'files': files, 'directories': directories})
 

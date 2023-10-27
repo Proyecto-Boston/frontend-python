@@ -70,11 +70,6 @@ body {
     color:white;
 }
 
-.btn-wide {
-    min-width: 70%;
-    margin-bottom: 3px;
-}
-
 .btn-orange.dropdown-toggle:focus,
 .btn-orange.dropdown-toggle:active {
     background-color: #ff5733;
@@ -97,4 +92,9 @@ body {
     background-color: #ff5733;
     color: white;
     border-color: #ff5733;
+}
+
+.btn-wide {
+    width: 300px;
+    margin-bottom: 5px;
 }
