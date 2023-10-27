@@ -80,11 +80,6 @@
                                                 <input type="hidden" name="download_file_name" value="{{ file.id }}">
                                                 <button type="submit" class="dropdown-item" name="download_file_button">Descargar</button>
                                             </form>
-                                            <form method="post" action="{% url 'manager' %}">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="change_file_name" value="{{ file.id }}">
-                                                <button type="submit" class="dropdown-item">Renombrar</button>
-                                            </form>
                                             <div class="dropdown-item">
                                                 <form method="post" action="{% url 'manager' %}">
                                                     {% csrf_token %}

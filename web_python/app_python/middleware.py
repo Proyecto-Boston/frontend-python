@@ -27,6 +27,8 @@ class JWTAuthenticationMiddleware:
                 
                 if request.path != '/manage/' and request.path != '/logout/' and request.path != '/shared/' and request.path != '/favicon.ico':
                     print("El usuario ya inicio sesión, redireccionando a /manage/")
+                    request.session['current_path'] = ""
+                    request.session['current_parent'] = 0
                     response = redirect('manager')
                     return response
 

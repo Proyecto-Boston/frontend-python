@@ -46,6 +46,8 @@ def signin(request):
                 response = HttpResponseRedirect('/manage/')
                 response.set_cookie(
                     'jwt', jwt_token, httponly=True, samesite='Strict')
+                request.session['current_path'] = ""
+                request.session['current_parent'] = 0
                 return response
             else:
                 # Si el login no pudo hacerse
@@ -138,6 +140,13 @@ def filemanager(request):
     directories = []
     # ID del usuario que tiene la sesión abierta
     userId = request.session.get('user_id', None)
+    # Ruta actual de la vista
+    request.session['current_path'] = ""
+    request.session['current_parent'] = 0
+    current_path = request.session.get('current_path')
+    current_parent = request.session.get('current_parent')
+    print("Ruta actual: " + current_path)
+    print("Padre actual: " + str(current_parent))
     print("Vista: ID del usuario iniciando sesión " + str(userId))
     try:
         # Enviar la solicitud SOAP al servidor
@@ -217,7 +226,11 @@ def filemanager(request):
         if 'create_folder' in request.POST:
             folder_name = request.POST['folder_name']
             print("Nombre carpeta digitado: " + folder_name)
-            if folder_name and crear_carpeta(folder_name, userId):
+            current_path = request.session.get('current_path')
+            print("Ruta donde se está actualmente: " + current_path)
+            current_parent = request.session.get('current_parent')
+            print("Padre actual: " + str(current_parent))
+            if folder_name and crear_carpeta(folder_name, userId, current_path, current_parent):
                 print("Se creó la carpeta exitosamente")
                 # Refrescar la vista para mostrar la nueva carpeta
                 return redirect('manager')
@@ -375,40 +388,51 @@ def filemanager(request):
             folder_to_enter = request.POST['folder_id']
             if (folder_to_enter!=None and str(folder_to_enter)!=""):
                 print("ID del directorio al que se quiere entrar: " + str(folder_to_enter))
+                nombre_directorio_acceso = get_directory_name_by_id(folder_to_enter, directories)
+                print("Nombre del directorio al que se quiere entrar: " + nombre_directorio_acceso)
+                ruta_directorio_acceso = get_directory_path_by_id(folder_to_enter, directories)
+                ruta_directorio_acceso = ruta_directorio_acceso[1:]
+                request.session['current_path'] = ruta_directorio_acceso
+                current_path = request.session.get('current_path')
+                print("Ruta actual: " + current_path)
+                request.session['current_parent'] = folder_to_enter
+                current_parent = request.session.get('current_parent')
+                print("Padre actual: " + str(current_parent))
+                subFiles = []
+                subDirectories = []
                 response = cliente.service.getSubFolderFiles(folder_to_enter)
                 if (response.statusCode == 201):
                     print("Se entró a la carpeta exitosamente")
                     print(response.statusCode)
                     print(response.details)
-                    subFiles = []
-                    subDirectories = []
-                    sv_data = response.json.replace(",null", "")
-                    server_subdata = json.loads(sv_data)
-                    print("server_subdata: " + str(server_subdata))
-                    for file_info in server_subdata['files']:
-                        file_entry = {
-                            "id": file_info['id'],
-                            "name": file_info['nombre'],
-                            "size": f"{file_info['tamano']/1000}kb",
-                            "path": file_info['ruta'],
-                            "userId": userId,
-                            "directory_id": file_info['directorio_id']
-                        }
-                        subFiles.append(file_entry)
-                    print("Arreglo de archivos: " + str(subFiles))
-                    if "folders" in server_subdata:
-                        for folder_info in server_subdata['folders']:
-                            folder_entry = {
-                                "id": folder_info['id'],
-                                "name": folder_info['nombre'],
-                                "size": folder_info['tamano'],
-                                "path": folder_info['ruta'],
-                                "nodeId": folder_info['nodoId'],
-                                "fatherId": folder_info['padreId'],
-                                "backNodeId": folder_info['respaldo_id']
+                    if (response.json!=None and response.json!=""):
+                        sv_data = response.json.replace(",null", "")
+                        server_subdata = json.loads(sv_data)
+                        print("server_subdata: " + str(server_subdata))
+                        for file_info in server_subdata['files']:
+                            file_entry = {
+                                "id": file_info['id'],
+                                "name": file_info['nombre'],
+                                "size": f"{file_info['tamano']/1000}kb",
+                                "path": file_info['ruta'],
+                                "userId": userId,
+                                "directory_id": file_info['directorio_id']
                             }
-                            subDirectories.append(folder_entry)
-                        print("Arreglo de subdirectorios: " + str(subDirectories))
+                            subFiles.append(file_entry)
+                        print("Arreglo de archivos: " + str(subFiles))
+                        if "folders" in server_subdata:
+                            for folder_info in server_subdata['folders']:
+                                folder_entry = {
+                                    "id": folder_info['id'],
+                                    "name": folder_info['nombre'],
+                                    "size": folder_info['tamano'],
+                                    "path": folder_info['ruta'],
+                                    "nodeId": folder_info['nodoId'],
+                                    "fatherId": folder_info['padreId'],
+                                    "backNodeId": folder_info['respaldo_id']
+                                }
+                                subDirectories.append(folder_entry)
+                            print("Arreglo de subdirectorios: " + str(subDirectories))
                     return render(request, 'file_manager.html', {'files': subFiles, 'directories': subDirectories})
                 else:
                     print("Error comunicandose con la carpeta")
@@ -419,11 +443,12 @@ def filemanager(request):
     return render(request, 'file_manager.html', {'files': files, 'directories': directories})
 
 
-def crear_carpeta(nombreCarpeta, userId):
+def crear_carpeta(nombreCarpeta, userId, currentPath, currentParent):
     try:
+        print("Ruta actual: " + currentPath)
         # DECLARAR CARPETA
-        folder_data = {"id": 1, "name": nombreCarpeta, "path": "", "userId": userId, "size":0,"nodeId": 1,
-                       "backNodeId": 2, "fatherId": 0}
+        folder_data = {"id": 1, "name": nombreCarpeta, "path": currentPath, "userId": userId, "size":0,"nodeId": 1,
+                       "backNodeId": 2, "fatherId": currentParent}
         print("Intentando crear carpeta:")
         print(str(folder_data))
         # ENVIAR SOLICITUD SOAP AL SERVIDOR

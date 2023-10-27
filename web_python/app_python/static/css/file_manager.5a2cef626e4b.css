@@ -1,0 +1,100 @@
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label,
+button,
+input {
+    font-family: Tahoma, sans-serif;
+}
+
+h4 {
+    color:white;
+}
+
+.topnav {
+    overflow: hidden;
+    background-color: #b44593;
+}
+
+.topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.topnav a.active {
+    background-color: #dd3675;
+    color: white;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.full-width-image {
+    width: 100%;
+    height: auto;
+}
+
+/* Add styles to position the content below the image */
+.content {
+    padding: 20px;
+    text-align: center;
+    color: #dd3675;
+    font-weight: bold;
+}
+
+body {
+    background-color: #f2f2f2;;
+}
+
+.btn-orange {
+    background-color: #dd3675;
+    color:white;
+}
+
+.btn-orange.dropdown-toggle:focus,
+.btn-orange.dropdown-toggle:active {
+    background-color: #ff5733;
+    color: white;
+    border-color: #ff5733;
+}
+
+
+.sidebar {
+    background-color: #b44593;
+}
+
+.btn-lighter {
+    background-color: #4d4d4d;
+    color:white;
+}
+
+.btn-lighter.dropdown-toggle:focus,
+.btn-lighter.dropdown-toggle:active {
+    background-color: #ff5733;
+    color: white;
+    border-color: #ff5733;
+}
+
+.btn-wide {
+    width: 300px;
+    margin-bottom: 5px;
+}
