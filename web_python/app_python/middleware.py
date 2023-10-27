@@ -25,7 +25,7 @@ class JWTAuthenticationMiddleware:
                     response.delete_cookie('jwt')
                     return response
                 
-                if request.path != '/manage/' and request.path != '/logout/' and request.path != '/shared/':
+                if request.path != '/manage/' and request.path != '/logout/' and request.path != '/shared/' and request.path != '/favicon.ico':
                     print("El usuario ya inicio sesión, redireccionando a /manage/")
                     response = redirect('manager')
                     return response

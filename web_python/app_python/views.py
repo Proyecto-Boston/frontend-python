@@ -194,7 +194,6 @@ def filemanager(request):
                     print("El usuario tampoco tiene carpetas")
             else:
                 print("El usuario no tiene archivos ni carpetas")
-            success_message = "---Operación completada exitosamente---"
         else:
             # Si no se pudo importar archivos
             error_message = "No pudieron importarse los archivos. Por favor vuelva a iniciar sesión"
@@ -327,8 +326,14 @@ def filemanager(request):
                     print(response.details)
                     return redirect('manager')
         if 'share_file_button' in request.POST:
+            print("-------------------- COMPARTIENDO ARCHIVO-----------------")
             file_to_share = request.POST['share_file_id']
             print("Archivo que se va a compartir: " + str(file_to_share))
+            user_to_share = request.POST['share_email']
+            print("Usuario al que se le va a compartir el archivo: " + str(user_to_share))
+            response = cliente.service.shareFile(str(user_to_share), file_to_share)
+            print(response.statusCode)
+            print(response.details)
         if 'download_file_button' in request.POST:
             file_to_download = request.POST['download_file_name']
             print("ID del archivo a descargar " + file_to_download)
@@ -337,7 +342,6 @@ def filemanager(request):
                 # Descargado exitosamente
                 print(response.statusCode)
                 print(response.details)
-                print(str(response.fileData))
                 file_name = get_file_name_by_id(file_to_download,files)
                 print("Nombre del archivo a descargar: " + str(file_name))
                 if (file_name!=None and file_name!=""):
@@ -391,7 +395,71 @@ def crear_carpeta(nombreCarpeta, userId):
     
 
 def shared(request):
-    return render (request, 'shared_manager.html')
+    print("----- VISTA DE ARCHIVOS COMPARTIDOS CON EL USUARIO -----")
+    # ID del usuario que tiene la sesión abierta
+    userId = request.session.get('user_id', None)
+    print("Vista: ID del usuario iniciando sesión " + str(userId))
+    # Lista de archivos (el arreglo contendrá la lista de archivos del usuario)
+    files = []
+    try:
+        # Enviar la solicitud SOAP al servidor
+        response = cliente.service.getSharedFiles(userId)
+
+        # Se pudieron cargar los archivos?
+        if response.statusCode == 200:
+            # Mostrar los archivos
+            print("--- Importando... ---")
+            print(str(response.details))
+            if str(response.details)=="Operacion exitosa.":
+                server_data = json.loads(response.json)
+                for file_info in server_data:
+                    file_entry = {
+                        "id": file_info['id'],
+                        "name": file_info['nombre'],
+                        "size": f"{file_info['tamano']/1000}kb",
+                        "userId": file_info['usuario_id']
+                    }
+                    files.append(file_entry)
+                print("Archivos compartidos: " + str(files))
+            else:
+                print("El usuario no tiene archivos compartidos")
+        else:
+            # Si no se pudo importar archivos
+            error_message = "No pudieron importarse los archivos. Por favor vuelva a iniciar sesión"
+            print(error_message)
+            return render(request, 'shared_manager.html', {'error_message': error_message, 'files': files})
+    except Fault as e:
+        # Errores SOAP (exceptions returned by the server)
+        error_message = f"SOAP Fault: {e.message}"
+        print(error_message)
+        return render(request, 'shared_manager.html', {'error_message': error_message, 'files': files})
+    except Exception as e:
+        # Errores inesperados
+        error_message = f"Unexpected Error: {str(e)}"
+        print(error_message)
+        return render(request, 'shared_manager.html', {'error_message': error_message, 'files': files})
+    
+    if request.method == 'POST':
+        if 'download_file_button' in request.POST:
+            file_to_download = request.POST['download_file_name']
+            print("ID del archivo a descargar " + file_to_download)
+            response = cliente.service.downloadFile(file_to_download)
+            if response.statusCode == 200:
+                # Descargado exitosamente
+                print(response.statusCode)
+                print(response.details)
+                file_name = get_file_name_by_id(file_to_download,files)
+                print("Nombre del archivo a descargar: " + str(file_name))
+                if (file_name!=None and file_name!=""):
+                    file_response = HttpResponse(response.fileData, content_type='application/octet-stream')
+                    file_response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                    print("El archivo se descargo con exito")
+                    return file_response
+            else:
+                print("Error: no pudo descargarse el archivo")
+                print(response.statusCode)
+                print(response.details)
+    return render (request, 'shared_manager.html', {'files': files})
 
 def get_directory_name_by_id(directory_id, directories):
     for directory in directories:
