@@ -12,7 +12,7 @@ import json
 
 # Inicialización de zeep, una libreria que permite interactuar con el WSDL usando Python
 transport = Transport(session=requests.Session())
-cliente = Client('http://java.bucaramanga.upb.edu.co:2376/app?wsdl', transport=transport)
+cliente = Client('http://localhost:2376/app?wsdl', transport=transport)
 print("Conectado a WSDL")
 
 
